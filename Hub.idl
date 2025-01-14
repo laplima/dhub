@@ -1,0 +1,9 @@
+module dhub {
+	
+	interface Hub {
+		readonly attribute string id;
+		oneway void add(in string nid, in Hub ref);
+		oneway void shutdown();
+	}; 
+
+};
