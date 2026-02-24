@@ -1,5 +1,5 @@
 #include "HubI.h"
-#include <fmt/format.h>
+#include <print>
 
 using namespace std;
 using namespace dhub;
@@ -11,7 +11,7 @@ char* Hub_i::id()
 
 void Hub_i::add(const char * nid, ::dhub::Hub_ptr ref)
 {
-	fmt::print("[{}] add({})\n", myid, nid);
+	print("[{}] add({})\n", myid, nid);
 	nmap[nid] = dhub::Hub::_duplicate(ref);
 }
 

@@ -18,7 +18,7 @@ namespace dhub {
 		Hub_i(std::string theid) : myid{std::move(theid)} {}
 		~Hub_i () override = default;
 		char* id() override;
-		void add(const char * nid, ::dhub::Hub_ptr ref) override;
+		void add(const char * nid, ::dhub::Hub_ptr ref) override;	// forward ref
 		void shutdown() override;
 	private:
 		std::string myid;

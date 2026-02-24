@@ -1,14 +1,14 @@
 # ACETAO CMake
 # (C) 2025 Luiz Lima Jr. All rights reserved.
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.30)
 
 project(dhub)
 
 set(IDL Hub.idl)			# IDL files
 set(IDL_DIR .)					# IDL files location
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_BUILD_TYPE Debug)
 
 set(SRC_DIR "sources")
@@ -17,8 +17,8 @@ set(SUBPROJECTS
 	server)
 
 # pkg-config
-find_package(fmt REQUIRED)
-find_package(spdlog)
+# find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
 
 # Generate ${mylibs}
 
@@ -70,6 +70,22 @@ foreach(idl ${IDL})
 	set(IDL_IMPL ${IDL_IMPL} ${idl}I.cpp)
 endforeach(idl)
 set(IDL_OUTPUT ${IDL_OUTPUT} ${SKELETONS})
+
+set(idls_)
+foreach(idl ${IDL})
+	set(idls_ ${idls_} ${IDL_DIR}/${idl})
+endforeach(idl)
+
+add_custom_command(
+	OUTPUT ${IDL_OUTPUT}
+	DEPENDS ${idls_}
+	COMMAND tao_idl
+	ARGS ${idls_} -o "${STUBS_DIR}"
+	COMMENT "Generating stubs + skeletons"
+	WORKING_DIRECTORY ${IDL_DIR}
+	VERBATIM)
+
+add_custom_target(${CMAKE_PROJECT_NAME}_stubs DEPENDS ${IDL_OUTPUT})
 
 # INCLUDES
 

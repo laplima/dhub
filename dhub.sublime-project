@@ -8,8 +8,8 @@
 	"build_systems": [
 		{
 			"name": "Build DHub",
-			"working_dir": "${project_path}/build",
-			"shell_cmd": "make"
+			"working_dir": "${project_path}",
+			"shell_cmd": "cmake --build build"
 		}
 	]
 }

@@ -1,8 +1,9 @@
-#include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <print>
+#include <format>
 #include <iostream>
 #include <colibry/ORBManager.h>
 #include <colibry/NameServer.h>
+#include <spdlog/spdlog.h>
 #include <span>
 #include <thread>
 #include "HubI.h"
@@ -25,17 +26,19 @@ int main(int argc, char* argv[])
 
 		colibry::NameServer ns{om};
 		ns.rebind(name, hub.in());
-		fmt::print("\"{}\" registered in the NS\n", name);
+		println("\"{}\" registered in the NS", name);
 
 		auto orbrun = [&om]() { om.run(); };
 		std::thread ot{orbrun};
 
-		fmt::print("Press ENTER to shutdown the server\n");
+		println("Press ENTER to shutdown the server");
 		cin.get();
 		om.shutdown();
 		ot.join();
 
 	} catch(const CORBA::Exception& e) {
-		fmt::print(stderr, "ERROR: {}\n", fmt::streamed(e));
+		ostringstream ss;
+		ss << e;
+		spdlog::error("ERROR: {}", ss.str());
 	}
 }

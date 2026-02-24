@@ -1,16 +1,12 @@
 #include "HubI.h"
-#include <fmt/format.h>
+#include <algorithm>
+#include <print>
+#include <spdlog/spdlog.h>
+#include <algorithm>
 
 using namespace std;
 using namespace dhub;
-
-// Hub_i::Hub_i ()
-// {
-// }
-
-// Hub_i::~Hub_i ()
-// {
-// }
+using spdlog::error;
 
 char* Hub_i::id()
 {
@@ -19,11 +15,14 @@ char* Hub_i::id()
 
 void Hub_i::add(const char * nid, ::dhub::Hub_ptr ref)
 {
-	fmt::print("[{}] add({})\n", myid, nid);
+	print("[{}] add({})\n", myid, nid);
+
+	// add nid to server map (or update reference)
 	if (!smap.contains(nid))
 		smap.emplace(nid, ServInfo{});
 	smap[nid].ref = dhub::Hub::_duplicate(ref);
 
+	// create vector of known servers
 	vector<string> known_servers;
 	for (const auto& [s,_] : smap)
 		known_servers.push_back(s);
@@ -31,22 +30,22 @@ void Hub_i::add(const char * nid, ::dhub::Hub_ptr ref)
 	// remove ex from all
 	auto exclude = [](vector<string>& all, const vector<string>& ex) {
 		for (const auto& s : ex) {
-			auto p = find(begin(all), end(all), s);
+			auto p = std::ranges::find(all, s);
 			if (p != end(all))
 				all.erase(p);
 		}
 	};
 
 	// send
-	for (auto it = smap.begin(); it != smap.end(); ++it) {
+	for (auto& [nnid, info] : smap) {
 		auto missing = known_servers;
 		// remove current key
-		missing.erase(find(begin(missing), end(missing), it->first));	// will always find
-		exclude(missing, it->second.already_sent);
+		missing.erase(std::ranges::find(missing, nnid));	// will always find
+		exclude(missing, info.already_sent);
 		// send missing to current
 		for (const auto& c : missing) {
-			it->second.ref->add(c.c_str(), smap[c].ref.in());
-			it->second.already_sent.push_back(c);
+			info.ref->add(c.c_str(), smap[c].ref.in());
+			info.already_sent.push_back(c);
 		}
 	}
 }
