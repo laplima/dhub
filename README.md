@@ -13,7 +13,7 @@ The hub component must be run first and have a well-known network address (or IO
 ## Compilation
 
 ```bash
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_PREFIX_PATH=$COLIBRY/lib64/cmake
 cmake --build build
 ```
 
